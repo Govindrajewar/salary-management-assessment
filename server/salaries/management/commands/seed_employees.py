@@ -77,8 +77,13 @@ class Command(BaseCommand):
         per_department_head_assigned = set()
 
         for i in range(count):
-            department = departments[i % len(departments)]
-            country = country_codes[i % len(country_codes)]
+            # Independent random draws, not i % len(...) round-robin: department and
+            # country counts share a common factor (gcd(8, 10) = 2), so cycling both
+            # off the same loop counter correlates them by parity - each department
+            # would only ever pair with half the countries. random.choice() (seeded,
+            # so still deterministic) avoids that.
+            department = random.choice(departments)
+            country = random.choice(country_codes)
             currency, (low, high) = COUNTRIES[country]
 
             first = fake.first_name()
