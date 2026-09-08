@@ -1,0 +1,27 @@
+databases:
+  - name: acme-salary-db
+    plan: free
+    databaseName: acme_salary
+    user: acme_salary
+
+services:
+  - type: web
+    name: acme-salary-api
+    runtime: python
+    plan: free
+    rootDir: server
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: acme-salary-db
+          property: connectionString

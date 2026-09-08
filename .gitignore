@@ -8,6 +8,8 @@ server/*.sqlite3
 server/.env
 server/.coverage
 server/htmlcov/
+server/staticfiles/*
+!server/staticfiles/.gitkeep
 
 # client (Node)
 client/node_modules/
