@@ -1,1 +1,14 @@
 Salary-Management-Assessment-Candidates.pdf
+
+# server (Python/Django)
+server/venv/
+server/__pycache__/
+server/**/__pycache__/
+server/*.sqlite3
+server/.env
+
+# client (Node)
+client/node_modules/
+client/dist/
+client/.env
+.claude/
