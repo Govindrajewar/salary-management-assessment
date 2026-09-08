@@ -23,6 +23,11 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
+
+  /* dataviz: categorical slot 1 (blue), plain hex - SVG fill can't reliably parse oklch() */
+  --chart-series-1: #2a78d6;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #898781;
 }
 
 .dark {
@@ -45,6 +50,10 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
+  --chart-series-1: #3987e5;
+  --chart-grid: #2c2c2a;
+  --chart-axis: #898781;
 }
 
 @theme inline {
