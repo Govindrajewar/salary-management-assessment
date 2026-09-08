@@ -18,15 +18,21 @@ export const COUNTRIES = [
 
 export const CURRENCIES = [...new Set(COUNTRIES.map((c) => c.currency))].sort()
 
+// Fixed locale ('en-US'), not the viewer's OS/browser locale: digit grouping must stay
+// consistent for every HR Manager looking at the same numbers, regardless of where
+// they're sitting - the OS default can silently switch to a different grouping system
+// (e.g. lakhs/crores) even for a currency like USD that has nothing to do with it.
+const SALARY_LOCALE = 'en-US'
+
 export function formatSalary(amount: number | string, currency: string): string {
   const value = typeof amount === 'string' ? Number(amount) : amount
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(SALARY_LOCALE, {
       style: 'currency',
       currency,
       maximumFractionDigits: 0,
     }).format(value)
   } catch {
-    return `${currency} ${value.toLocaleString()}`
+    return `${currency} ${value.toLocaleString(SALARY_LOCALE)}`
   }
 }
