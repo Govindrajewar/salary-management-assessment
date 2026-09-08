@@ -18,6 +18,7 @@ services:
       python manage.py migrate &&
       python manage.py shell -c "from django.core.management import call_command; from salaries.models import Employee; call_command('seed_employees') if not Employee.objects.exists() else print('already seeded, skipping')"
     startCommand: "gunicorn config.wsgi:application"
+    healthCheckPath: /api/health/
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true

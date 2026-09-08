@@ -2,7 +2,7 @@ import csv
 import statistics
 from datetime import date
 
-from django.db import transaction
+from django.db import connection, transaction
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -34,6 +34,21 @@ EXPORT_FIELDS = [
     "termination_date",
     "manager_name",
 ]
+
+
+class HealthCheckView(APIView):
+    """Used by Render's health check and for manual uptime probes."""
+
+    def get(self, request):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+        except Exception as exc:
+            return Response(
+                {"status": "error", "database": "unreachable", "detail": str(exc)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response({"status": "ok", "database": "ok"})
 
 
 class DepartmentViewSet(viewsets.ReadOnlyModelViewSet):
