@@ -10,7 +10,13 @@ services:
     runtime: python
     plan: free
     rootDir: server
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    # Free-tier Render has no one-off Jobs API, so the initial 10k-employee seed rides
+    # along in the build step - guarded so redeploys never reseed on top of real data.
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate &&
+      python manage.py shell -c "from django.core.management import call_command; from salaries.models import Employee; call_command('seed_employees') if not Employee.objects.exists() else print('already seeded, skipping')"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
       - key: DJANGO_SECRET_KEY
