@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import EmployeeFilter
+from .fx import convert as fx_convert
 from .models import Department, Employee, SalaryChange
 from .serializers import (
     DepartmentSerializer,
@@ -182,6 +183,41 @@ class DashboardStatsView(APIView):
             )
             results.append(entry)
         return results
+
+
+class CompareCountriesView(APIView):
+    """Average salary for two countries, both converted into one user-chosen
+    currency using a static FX table so employees paid in a different
+    currency still count instead of being dropped from the comparison.
+    """
+
+    def get(self, request):
+        country1 = request.query_params.get("country1")
+        country2 = request.query_params.get("country2")
+        currency = request.query_params.get("currency")
+        if not country1 or not country2 or not currency:
+            return Response(
+                {"detail": "Provide country1, country2 and currency query params."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        include_terminated = request.query_params.get("include_terminated", "false").lower() == "true"
+        qs = Employee.objects.all()
+        if not include_terminated:
+            qs = qs.filter(employment_status=Employee.EmploymentStatus.ACTIVE)
+
+        results = {}
+        for country in (country1, country2):
+            rows = qs.filter(country__iexact=country).values_list("base_salary", "currency")
+            converted = [fx_convert(salary, native_currency, currency) for salary, native_currency in rows]
+            results[country] = {
+                "country": country,
+                "currency": currency,
+                "count": len(converted),
+                "avg_salary": round(sum(converted) / len(converted), 2) if converted else None,
+            }
+
+        return Response(results)
 
 
 class BulkSalaryIncrementView(APIView):

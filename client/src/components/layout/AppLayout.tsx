@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 const NAV_ITEMS = [
   { to: '/employees', label: 'Employees' },
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/compare', label: 'Compare countries' },
 ]
 
 export function AppLayout() {

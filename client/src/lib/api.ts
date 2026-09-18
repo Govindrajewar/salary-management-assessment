@@ -69,6 +69,15 @@ export interface DashboardStats {
   by_country: DashboardStatRow[]
 }
 
+export interface CompareCountriesRow {
+  country: string
+  currency: string
+  count: number
+  avg_salary: number | null
+}
+
+export type CompareCountriesResponse = Record<string, CompareCountriesRow>
+
 export interface BulkIncrementRequest {
   department?: number
   country?: string
@@ -159,6 +168,11 @@ export const api = {
 
   dashboardStats: (includeTerminated = false) =>
     request<DashboardStats>(`/dashboard/stats/${buildQuery({ include_terminated: includeTerminated })}`),
+
+  compareCountries: (country1: string, country2: string, currency: string, includeTerminated = false) =>
+    request<CompareCountriesResponse>(
+      `/dashboard/compare-countries/${buildQuery({ country1, country2, currency, include_terminated: includeTerminated })}`,
+    ),
 
   bulkIncrement: (data: BulkIncrementRequest) =>
     request<BulkIncrementResponse>('/salary/bulk-increment/', { method: 'POST', body: JSON.stringify(data) }),
